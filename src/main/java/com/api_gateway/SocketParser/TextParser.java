@@ -1,6 +1,9 @@
 package com.api_gateway.SocketParser;
 
+import com.api_gateway.SocketResponder.ReqResponder;
+
 import java.io.InputStream;
+import java.io.PrintWriter;
 
 public class TextParser {
 
@@ -30,8 +33,7 @@ public class TextParser {
             throw new RuntimeException(e);
         }
     }
-
-    public String txtReader(InputStream inputStream){
+    public String txtReader(InputStream inputStream , PrintWriter printWriter , ReqResponder reqResponder){
         StringBuilder stringBuilder = new StringBuilder();
 
         while(true){
@@ -83,7 +85,7 @@ public class TextParser {
                 }
 
             } catch (Exception e){
-                break;
+               reqResponder.server_error(printWriter,e.getMessage());
             }
         }
 
