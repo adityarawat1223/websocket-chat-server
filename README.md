@@ -136,7 +136,7 @@ function mask(payload, maskKey[4]):
 ```
 ## Testing 
 Console will Echo the message coming from browser using index.html
-i provided in test-client format you can close socket 
+i provided in test-client ,you can close socket 
 or send message using buttons provided
 
 ![Websocket-demo](demo-image/img.png)
