@@ -3,7 +3,7 @@ package com.api_gateway.SocketParser;
 import com.api_gateway.SocketResponder.ReqResponder;
 
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 
 public class TextParser {
 
@@ -11,7 +11,7 @@ public class TextParser {
         return x == -1;
     }
 
-    long BringPayload(int init, InputStream inputStream) {
+    public long BringPayload(int init, InputStream inputStream) {
         try {
             if(init < 126){
                 return init;
@@ -33,24 +33,28 @@ public class TextParser {
             throw new RuntimeException(e);
         }
     }
-    public String txtReader(InputStream inputStream , PrintWriter printWriter , ReqResponder reqResponder){
+    public String txtReader(InputStream inputStream , OutputStream outputStream, ReqResponder reqResponder){
         StringBuilder stringBuilder = new StringBuilder();
-
+        boolean close = false;
         while(true){
             try {
 
                 int header = inputStream.read();
-                if(Validator(header)) break;
+                if(Validator(header))  {close = true;break;}
 
                 boolean FIN = (header & 0x80) != 0;
                 int opcode = (header & 0x0F);
 
                 if(opcode != 1){
+                    if(opcode == 8){
+                        reqResponder.close(outputStream);
+                    }
+                    close = true;
                     break;
                 }
 
                 int payloadInfo = inputStream.read();
-                if(Validator(payloadInfo)) break;
+                if(Validator(payloadInfo))  {close = true;break;}
 
                 boolean mask = (payloadInfo & 0x80) != 0;
                 int initLen = (payloadInfo & 0x7F);
@@ -62,7 +66,7 @@ public class TextParser {
                 if(mask){
                     for(int i = 0; i < 4; i++){
                         Masked[i] = inputStream.read();
-                        if(Validator(Masked[i])) break;
+                        if(Validator(Masked[i])) {close = true;break;}
                     }
                 }
 
@@ -70,7 +74,7 @@ public class TextParser {
 
                 for(long i = 0; i < payload; i++){
                     int temp = inputStream.read();
-                    if(Validator(temp)) break;
+                    if(Validator(temp)) {close = true;break;}
 
                     if(mask){
                         temp = temp ^ Masked[j];
@@ -85,10 +89,12 @@ public class TextParser {
                 }
 
             } catch (Exception e){
-               reqResponder.server_error(printWriter,e.getMessage());
+               reqResponder.server_error(outputStream,e.getMessage());
             }
         }
-
+        if(close){
+            return null;
+        }
         return stringBuilder.toString();
     }
 }

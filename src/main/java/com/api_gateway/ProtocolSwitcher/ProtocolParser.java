@@ -2,7 +2,7 @@ package com.api_gateway.ProtocolSwitcher;
 import com.api_gateway.SocketResponder.ReqResponder;
 import com.api_gateway.dto.HttpRequest;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 
 public class ProtocolParser {
     void reqParser(String message, HttpRequest httpRequest) {
@@ -17,9 +17,9 @@ public class ProtocolParser {
         String value = message.substring(idx + 1).trim();
         httpRequest.headers.put(key, value);
     }
-    public void runner(InputStream inputStream , HttpRequest httpRequest , ReqResponder reqResponder, PrintWriter printWriter){
+    public void runner(InputStream inputStream , HttpRequest httpRequest , ReqResponder reqResponder, OutputStream outputStream){
 
-        boolean reqline = true;
+        boolean req = true;
         StringBuilder stringBuilder = new StringBuilder();
         try {
             while (true) {
@@ -33,9 +33,9 @@ public class ProtocolParser {
                 }
 
                 if((char) input == '\n'){
-                    if(reqline){
+                    if(req){
                         reqParser(stringBuilder.toString(),httpRequest);
-                        reqline= false;
+                        req = false;
                     }
                     else{
                         if(stringBuilder.isEmpty()){
@@ -51,7 +51,7 @@ public class ProtocolParser {
                 }
             }
         }catch (Exception e){
-            reqResponder.server_error(printWriter,e.getMessage());
+            reqResponder.server_error(outputStream,e.getMessage());
         }
 
     }

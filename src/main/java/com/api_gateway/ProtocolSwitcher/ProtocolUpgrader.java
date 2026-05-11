@@ -2,7 +2,7 @@ package com.api_gateway.ProtocolSwitcher;
 import com.api_gateway.SocketResponder.ReqResponder;
 import com.api_gateway.dto.HttpRequest;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -27,7 +27,7 @@ public class ProtocolUpgrader {
         yes &= (Version.equalsIgnoreCase("13"));
         return yes;
     }
-    public boolean Upgrader(HttpRequest httpRequest , ReqResponder reqResponder, PrintWriter printWriter) {
+    public boolean Upgrader(HttpRequest httpRequest , ReqResponder reqResponder, OutputStream outputStream) {
 
         if(validator(httpRequest)){
             String Key = httpRequest.headers.get("sec-websocket-key");
@@ -37,14 +37,14 @@ public class ProtocolUpgrader {
                 byte[] hash = sha1.digest(value.getBytes(StandardCharsets.UTF_8));
 
                 Key = Base64.getEncoder().encodeToString(hash);
-                reqResponder.upgrade(printWriter,Key);
+                reqResponder.upgrade(outputStream,Key);
                 return true;
             }
             catch (Exception e){
-                reqResponder.server_error(printWriter,e.getMessage());
+                reqResponder.server_error(outputStream,e.getMessage());
             }
         }
-        reqResponder.invalid_request(printWriter);
+        reqResponder.invalid_request(outputStream);
         return false;
     }
 }

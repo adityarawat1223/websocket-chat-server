@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<label for="msg"></label><input id="msg" placeholder="message">
+<button onclick="send()">Send</button>
+<button onclick="closeSocket()">close</button>
+
+
+<script>
+    const ws = new WebSocket("ws://localhost:9090/chat");
+
+    ws.onopen = () => {
+        console.log("Connected");
+    };
+
+    ws.onmessage = (event) => {
+        console.log("Server:", event.data);
+    };
+
+    ws.onclose = () => {
+        console.log("Closed");
+    };
+
+    function send() {
+        const val = document.getElementById("msg").value;
+        ws.send(val);
+    }
+    function closeSocket(){
+        ws.close();
+    }
+</script>
+
+</body>
+</html>
