@@ -64,7 +64,7 @@ Better Understanding
 |                     Payload Data continued ...                |
 +---------------------------------------------------------------+
 ```
-___
+
 ### Basic Explanation of Diagram 
 
 
@@ -78,7 +78,7 @@ and the last 4 bit is about opcode which is hard coded
 0001 means text in RFC- 6455 Protocol which is enough for our
 text only chat server
 
-___
+
 
 ### Second Byte
 
@@ -94,14 +94,14 @@ Read Next two Bytes to get true length because length
 of payload can not be represented  in 7 bits alone
 means 126 <= length <= 65,535
 
-### Case-3 (length == 127)
+#### Case-3 (length == 127)
 
 Read Next 8 Bytes to get true length as range of length is
 127 <= (2^64) -1 
 
 After this you read  4-byte masking key if mask bit is set 
 and then read your payload info from length 
-___
+
 
 ### Masking Algorithm :-
 
